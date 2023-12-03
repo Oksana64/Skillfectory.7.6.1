@@ -1,0 +1,97 @@
+class Cell: 
+    def __init__(self, number): 
+        self.number = number 
+        self.busy = False 
+ 
+ 
+class Board: 
+    def __init__(self): 
+        self.board = [Cell(i) for i in range(1, 10)] 
+ 
+    def print_board(self): 
+        """Метод print_board выводит на печать доску для игры, в текущем состоянии""" 
+        print('-' * 13) 
+        for i in range(3): 
+            print(f'| {self.board[0 + i * 3].number} | ' 
+                  f'{self.board[1 + i * 3].number} | ' 
+                  f'{self.board[2 + i * 3].number} |') 
+            print('-' * 13) 
+ 
+    def check_win(self): 
+        """Метод check_win определяет комбинации для победе""" 
+        win_combination = ((0, 1, 2), (3, 4, 5), (6, 7, 8), 
+                           (0, 3, 6), (1, 4, 7), (2, 5, 8), 
+                           (0, 4, 8), (2, 4, 6)) 
+        for comb in win_combination: 
+            if all(self.board[cell].number == self.board[comb[0]].number for cell in comb): 
+                return True 
+        return False  
+     
+    def check_busy(self, number): 
+        """Метод check_busy устанавливает, что клетка занята""" 
+        if self.board[number - 1].busy: 
+            return True 
+        return False 
+ 
+ 
+class Player: 
+    def __init__(self, name, sym): 
+        self.name = name 
+        self.sym = sym 
+        self.win = False 
+ 
+    def go_cell(self, number, board): 
+        """Метод go_cell определяет занята ли клетка и если нет присваивает символ игрока""" 
+        board.board[number - 1].busy = True 
+        board.board[number - 1].number = self.sym 
+ 
+ 
+class Game: 
+    def __init__(self): 
+        self.board = Board() 
+ 
+    def one_move(self, player): 
+        """Метод one_move определяет алгоритм одного хода игроком""" 
+        try: 
+            num = int(input(f'{player.name} ходит - {player.sym} (клетка от 1 до 9): ')) 
+            if 1 <= num <= 9: 
+                if board.check_busy(num): 
+                    print('Клетка занята!') 
+                    self.one_move(player) 
+                else: 
+                    player.go_cell(num, board) 
+            else: 
+                raise ValueError('Ошибка ввода клетки.') 
+ 
+        except ValueError as exc: 
+            print(exc) 
+            self.one_move(player) 
+ 
+ 
+player_1 = Player('Крокодил Гена', 'X') 
+player_2 = Player('Чебурашка', 'O') 
+board = Board() 
+game = Game() 
+ 
+ 
+def main(): 
+    count = 0 
+    while True: 
+        board.print_board() 
+        if count % 2 == 0: 
+            game.one_move(player_1) 
+            if board.check_win(): 
+                print(f'{player_1.name} победил!') 
+                break 
+        else: 
+            game.one_move(player_2) 
+            if board.check_win(): 
+                print(f'{player_2.name} победил!') 
+                break 
+        count += 1 
+        if count == 9: 
+            print('Ничья.') 
+            break 
+    board.print_board()
+
+main()
